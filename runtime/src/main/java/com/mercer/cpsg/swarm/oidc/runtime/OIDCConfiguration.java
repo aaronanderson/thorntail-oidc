@@ -38,9 +38,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mercer.cpsg.swarm.oidc.OIDCFraction;
 
-/**
- * @author Bob McWhirter
- */
 public class OIDCConfiguration extends AbstractServerConfiguration<OIDCFraction> {
 
 	private static final Logger LOG = Logger.getLogger(OIDCConfiguration.class.getName());

@@ -34,10 +34,6 @@ import org.wildfly.swarm.undertow.descriptors.WebXmlAsset;
 import com.mercer.cpsg.swarm.oidc.OIDC;
 import com.mercer.cpsg.swarm.oidc.Secured;
 
-/**
- * @author Bob McWhirter
- * @author Ken Finnigan
- */
 public class SecuredImpl extends AssignableBase<ArchiveBase<?>> implements Secured {
 
 	/**

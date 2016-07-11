@@ -23,9 +23,6 @@ import org.wildfly.swarm.config.security.security_domain.authentication.LoginMod
 import org.wildfly.swarm.security.SecurityFraction;
 import org.wildfly.swarm.spi.api.Fraction;
 
-/**
- * @author Bob McWhirter
- */
 public class OIDCFraction extends OIDC<OIDCFraction> implements Fraction {
 
 	private boolean inhibitDefaultDatasource = false;

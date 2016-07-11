@@ -17,6 +17,7 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
  * Role names are passed into the loginmodule via a non-standard claim named "groups"
  * The OIDC metadata URL is retrieved and parsed at startup time. If a network connection is not available the authentication module will not initialize and the container will need to be restarted. The JWS certificates could automatically rotate and the container would need to be restarted if this happens to pickup the latest metadata changes. 
  * By default the fraction stores the redirect URL state value and nonce value in the JavaEE HTTPSession for verification. This goes against the principle of stateless microservices that can be horizontally scaled without service disruption. The ODIC configuration can be set to not use a nonce and to encrypt the redirect URL state with a shared key if on demand scaling is needed. 
+ * The fraction provides a Secured interface similar to the Keycloak fraction so that that protected path declarations can be programatically made instead of specified in the web.xml or with the standard JavaEE annotations. This is an optional feature.
  
  ##Keycloak Setup
  

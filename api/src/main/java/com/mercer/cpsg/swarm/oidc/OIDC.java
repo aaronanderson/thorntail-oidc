@@ -16,9 +16,6 @@ package com.mercer.cpsg.swarm.oidc;
 
 import java.util.List;
 
-/**
- * @author Bob McWhirter
- */
 public class OIDC<T extends OIDC<T>> {
 
 	private String context = "/oidc";
