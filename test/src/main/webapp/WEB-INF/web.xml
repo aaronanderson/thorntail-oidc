@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	version="3.1" metadata-complete="false">
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Protected Resources</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint> <!-- authentication required but no roles are passed from WAAD. Following is based on page 13-127 of Servlet 3.1 spec -->
+			<!-- <role-name>**</role-name> -->
+			<role-name>Everyone</role-name>
+		</auth-constraint>
+		<!-- <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> </user-data-constraint> -->
+	</security-constraint>
+
+	<login-config>
+		<auth-method>OIDC</auth-method>
+		<realm-name>demo</realm-name>
+	</login-config>
+
+
+<!--    <login-config>
+        <auth-method>KEYCLOAK</auth-method>
+        <realm-name>NotUsed</realm-name>
+    </login-config>
+-->
+	<security-role>
+		<description />
+		<role-name>Everyone</role-name>
+	</security-role>
+
+	<error-page>
+		<location>/error.jsp</location>
+	</error-page>
+
+</web-app>

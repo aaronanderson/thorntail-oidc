@@ -1,0 +1,11 @@
+{
+  "realms" : [ {
+    "name" : "demo",
+    "provider" : {
+      "name" : "Okta",
+      "clientId" : "CLIENT_ID_GOES_HERE",
+      "scope" : "openid profile groups",     
+      "metadataURL" : "https://OKTA_ORGANIZATION.okta.com/.well-known/openid-configuration"
+    }
+  } ]
+}

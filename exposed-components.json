@@ -1,0 +1,4 @@
+{"Nimbus OpenID Connect": [                                                     
+  {"name": "oidc",              "doc": "oidc-api"},         
+  {"name": "oidc-modules"},                                    
+]}
