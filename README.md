@@ -101,7 +101,8 @@ or
       "name" : "Okta",
       "clientId" : "aaaaaaaaaaaaaaaaaaaaaa",
       "scope" : "openid profile groups",     
-      "metadataURL" : "https://cpsg1.okta.com/.well-known/openid-configuration"
+      "metadataURL" : "https://OKTA_ORG.okta.com/.well-known/openid-configuration"
+
     }
   } ]
 }
