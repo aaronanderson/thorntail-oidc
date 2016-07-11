@@ -1,0 +1,37 @@
+<module xmlns="urn:jboss:module:1.3" name="com.mercer.cpsg.swarm.oidc" slot="runtime">
+	<resources>
+		<artifact name="com.mercer.cpsg.swarm.oidc:oidc-runtime:${project.version}" />
+		<artifact name="com.nimbusds:oauth2-oidc-sdk:5.10.1" />
+		<artifact name="com.nimbusds:nimbus-jose-jwt:4.21" />
+		<artifact name="com.nimbusds:lang-tag:1.4" />
+		<artifact name="net.minidev:json-smart:1.3.1" />
+		<artifact name="commons-io:commons-io:2.4" />
+		<artifact name="org.apache.commons:commons-collections4:4.1" />
+		<artifact name="org.apache.commons:commons-lang3:3.4" />
+	</resources>
+
+	<dependencies>
+		<module name="com.mercer.cpsg.swarm.oidc" />
+		<module name="org.wildfly.swarm.container" />
+		<module name="org.wildfly.swarm.container" slot="runtime" />
+		<module name="org.wildfly.swarm.configuration" />
+
+
+		<module name="javax.servlet.api" />
+		<module name="javax.mail.api" />
+
+
+		<module name="io.undertow.servlet" />
+		<module name="io.undertow.core" />
+		<module name="org.jboss.shrinkwrap" />
+		<module name="org.wildfly.swarm.undertow" />
+		<module name="org.wildfly.swarm.security" />
+		<module name="org.wildfly.extension.undertow" /><!-- AccountImpl -->
+		<module name="org.picketbox"/> <!-- AbstractServerLoginModule -->
+
+
+		<module name="com.fasterxml.jackson.core.jackson-annotations" />
+		<module name="com.fasterxml.jackson.core.jackson-core" />
+		<module name="com.fasterxml.jackson.core.jackson-databind" />
+	</dependencies>
+</module>
