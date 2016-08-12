@@ -50,6 +50,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
@@ -65,6 +66,7 @@ import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.util.JSONObjectUtils;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
@@ -135,7 +137,7 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 	@Override
 	public AuthenticationMechanismOutcome authenticate(HttpServerExchange exchange, SecurityContext securityContext) {
 
-		// ServletRequestContext servletRequestContext =
+		// ServletRequestContext servletRequestContext
 		// exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 		// HttpServletRequest request =
 		// servletRequestContext.getOriginalRequest();
@@ -145,13 +147,24 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		context.setError(false);
 		exchange.putAttachment(OIDCContext.ATTACHMENT_KEY, context);
 
-		LOG.fine("Requested URL: " + exchange.getRelativePath());
-
-		// String authorization =
-		// exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
+		LOG.info("Requested URL: " + exchange.getRelativePath());
+		if (exchange.getRequestHeaders().contains(Headers.AUTHORIZATION)) {
+			return processAuthorization(exchange);
+		}
 
 		if (exchange.getRequestPath().equals(redirectPath)) {
 			return processOIDCAuthResponse(exchange);
+		}
+
+		// for identity provider initiated login, capture the issuer. If IDP
+		// pointed at OIDC endpoint above authenticated users would bypass this
+		// module
+		// and the request would go to the protected application. More than
+		// likely the application would not have
+		// anything mapped at the OIDC endpoint URL and an error would be
+		// generated.
+		if (exchange.getQueryParameters().containsKey("iss")) {
+			context.setIssuer(exchange.getQueryParameters().get("iss").getLast());
 		}
 
 		return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
@@ -161,9 +174,7 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 	@Override
 	public ChallengeResult sendChallenge(HttpServerExchange exchange, SecurityContext securityContext) {
 		OIDCContext oidcContext = exchange.getAttachment(OIDCContext.ATTACHMENT_KEY);
-		// even though authenticate() returns not attempted which should move on
-		// to the next mechanism a challenge is still sent so check for errors
-		// here and send appropriate response
+		// NOT_AUTHENTICATED and NOT_ATTEMPTED always send challenges
 		if (oidcContext.isError()) {
 			return new ChallengeResult(false, HttpServletResponse.SC_UNAUTHORIZED);
 		}
@@ -174,18 +185,29 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		return new ChallengeResult(true, HttpServletResponse.SC_FOUND);
 	}
 
+	protected AuthenticationMechanismOutcome processAuthorization(HttpServerExchange exchange) {
+		String authorization = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
+		try {
+			// TODO support passing in a JWT id_token instead of an oauth access token. This would bypass an expensive profile lookup and realize the goal of using
+			// OpenID Connect tokens for SSO
+			BearerAccessToken accessToken = BearerAccessToken.parse(authorization);
+			UserInfoSuccessResponse info = fetchProfile(accessToken);
+			// JWT idToken = JWTParser.parse(accessToken.getValue());
+			// JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject("demo").build();
+			// PlainJWT idToken = new PlainJWT(claimsSet);
+			// validateToken(idToken, exchange, false);
+			return complete(info.getUserInfo().toJWTClaimsSet(), accessToken, null, exchange, false);
+		} catch (Exception e) {
+			OIDCContext oidcContext = exchange.getAttachment(OIDCContext.ATTACHMENT_KEY);
+			oidcContext.setError(true);
+			exchange.getSecurityContext().authenticationFailed("Unable to obtain OIDC JWT token from authorization header", mechanismName);
+			return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+		}
+
+	}
+
 	protected AuthenticationMechanismOutcome processOIDCAuthResponse(HttpServerExchange exchange) {
 		try {
-			// check for IDP initiated sign on request
-			if (exchange.getRequestMethod().equals(Methods.GET)) {
-				if (exchange.getQueryParameters().containsKey("iss")) {
-					// Since there is only one IDP configured automatically
-					// redirect to it, no need to check which one
-					return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
-
-				}
-			}
-
 			AuthenticationResponse authResp = authenticate(exchange);
 
 			if (authResp instanceof AuthenticationErrorResponse) {
@@ -202,13 +224,15 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 
 			AuthorizationCode authCode = successResponse.getAuthorizationCode();
 			JWT idToken = successResponse.getIDToken();
+			AccessToken accessToken = successResponse.getAccessToken();
 
 			if (idToken == null && authCode != null) {
 				OIDCTokenResponse tokenResponse = fetchToken(authCode, exchange);
 				idToken = tokenResponse.getOIDCTokens().getIDToken();
+				accessToken = tokenResponse.getOIDCTokens().getAccessToken();
 			}
-			validateToken(idToken, exchange);
-			return complete(idToken, returnURL, exchange);
+			validateToken(idToken, exchange, true);
+			return complete(idToken.getJWTClaimsSet(), accessToken, returnURL, exchange, true);
 
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "", e);
@@ -234,13 +258,13 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		return AuthenticationResponseParser.parse(new URI(exchange.getRequestURI()), params);
 	}
 
-	protected void validateToken(JWT token, HttpServerExchange exchange) throws BadJOSEException, JOSEException {
+	protected void validateToken(JWT token, HttpServerExchange exchange, boolean checkNonce) throws BadJOSEException, JOSEException {
 		if (token == null) {
 			throw new BadJOSEException("Token is null");
 		} else if (token instanceof SignedJWT) {
 			SignedJWT sToken = (SignedJWT) token;
 			Nonce nonce;
-			if (oidcProvider.isCheckNonce()) {
+			if (checkNonce && oidcProvider.isCheckNonce()) {
 				nonce = new Nonce((String) getSession(exchange).getAttribute(NONCE_KEY));
 			} else {
 				nonce = null;
@@ -270,7 +294,7 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		return (OIDCTokenResponse) tokenResponse;
 	}
 
-	protected UserInfoSuccessResponse fetchProfile(BearerAccessToken accessToken, HttpServerExchange exchange) throws Exception {
+	protected UserInfoSuccessResponse fetchProfile(BearerAccessToken accessToken) throws Exception {
 		UserInfoRequest userInfoReq = new UserInfoRequest(oidcProvider.getUserInfoURI(), accessToken);
 		HTTPResponse userInfoHTTPResp = userInfoReq.toHTTPRequest().send();
 		UserInfoResponse userInfoResponse = UserInfoResponse.parse(userInfoHTTPResp);
@@ -281,8 +305,8 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		return (UserInfoSuccessResponse) userInfoResponse;
 	}
 
-	protected AuthenticationMechanismOutcome complete(JWT idToken, String returnURL, HttpServerExchange exchange) throws Exception {
-		OIDCPrincipal principal = new OIDCPrincipal(idToken.getJWTClaimsSet().getSubject(), idToken.getJWTClaimsSet().getClaims());
+	protected AuthenticationMechanismOutcome complete(JWTClaimsSet claims, AccessToken accessToken, String returnURL, HttpServerExchange exchange, boolean redirect) throws Exception {
+		OIDCPrincipal principal = new OIDCPrincipalExt(claims, accessToken);
 		Account account = new AccountImpl(principal);
 		account = identityManager.verify(account);
 		if (account == null) {
@@ -293,9 +317,11 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 			return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
 		}
 		exchange.getSecurityContext().authenticationComplete(account, mechanismName, true);
-		exchange.getResponseHeaders().put(Headers.LOCATION, returnURL != null && !returnURL.isEmpty() ? returnURL : "/");
-		exchange.setStatusCode(HttpServletResponse.SC_FOUND);
-		exchange.endExchange();
+		if (redirect) {
+			exchange.getResponseHeaders().put(Headers.LOCATION, returnURL != null && !returnURL.isEmpty() ? returnURL : "/");
+			exchange.setStatusCode(HttpServletResponse.SC_FOUND);
+			exchange.endExchange();
+		}
 		LOG.fine("authentificated " + principal);
 		return AuthenticationMechanismOutcome.AUTHENTICATED;
 	}
@@ -601,6 +627,7 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		static final AttachmentKey<OIDCContext> ATTACHMENT_KEY = AttachmentKey.create(OIDCContext.class);
 
 		private boolean error;
+		private String issuer;
 
 		public boolean isError() {
 			return error;
@@ -608,6 +635,27 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 
 		public void setError(boolean error) {
 			this.error = error;
+		}
+
+		public String getIssuer() {
+			return issuer;
+		}
+
+		public void setIssuer(String issuer) {
+			this.issuer = issuer;
+		}
+
+	}
+
+	public class OIDCPrincipalExt extends OIDCPrincipal {
+		final JWTClaimsSet claimsSet;
+		final AccessToken accessToken;
+
+		protected OIDCPrincipalExt(JWTClaimsSet claimsSet, AccessToken accessToken) throws ParseException {
+			super(claimsSet.getSubject(), claimsSet.getClaims());
+			this.claimsSet = claimsSet;
+			this.accessToken = accessToken;
+
 		}
 
 	}

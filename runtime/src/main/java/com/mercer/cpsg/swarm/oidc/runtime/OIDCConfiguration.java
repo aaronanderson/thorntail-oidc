@@ -90,11 +90,17 @@ public class OIDCConfiguration extends AbstractServerConfiguration<OIDCFraction>
 			if (webXML.getLoginRealm("OIDC") == null && !fraction.listRealms().isEmpty()) {
 				webXML.setLoginConfig("OIDC", fraction.listRealms().get(0).getName());
 			}
+			
+			a.as(JARArchive.class).addModule("com.mercer.cpsg.swarm.oidc", "runtime");
+			a.as(JARArchive.class).addModule("com.mercer.cpsg.swarm.oidc", "api");//This was needed so that whren swarm is started with IDE/mvn wildfly-swarm:run picks up the OIDCPrincipal class
+			a.as(JARArchive.class).addAsServiceProvider("io.undertow.servlet.ServletExtension", "com.mercer.cpsg.swarm.oidc.runtime.OIDCServletExtension");
+			
+			if (!fraction.isInhibitDefaultDatasource()) {
+				a.as(WARArchive.class).setSecurityDomain("oidc-domain");
+			}
 		}
 
-		if (!fraction.isInhibitDefaultDatasource()) {
-			a.as(WARArchive.class).setSecurityDomain("oidc-domain");
-		}
+		
 		/*
 		
 		
@@ -103,9 +109,7 @@ public class OIDCConfiguration extends AbstractServerConfiguration<OIDCFraction>
 		// added runtime ServletExtension to deployment classpath and declare
 		// extension
 
-		a.as(JARArchive.class).addModule("com.mercer.cpsg.swarm.oidc", "runtime");
-		a.as(JARArchive.class).addModule("com.mercer.cpsg.swarm.oidc", "api");//This was needed so that whren swarm is started with IDE/mvn wildfly-swarm:run picks up the OIDCPrincipal class
-		a.as(JARArchive.class).addAsServiceProvider("io.undertow.servlet.ServletExtension", "com.mercer.cpsg.swarm.oidc.runtime.OIDCServletExtension");
+		
 	}
 
 	@Override

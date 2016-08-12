@@ -16,9 +16,11 @@ package com.mercer.cpsg.swarm.oidc.runtime;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContext;import org.jboss.jandex.IndexWriter;
+import javax.servlet.ServletContext;
+import org.jboss.jandex.IndexWriter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,7 +34,7 @@ import io.undertow.servlet.api.AuthMethodConfig;
 import io.undertow.servlet.api.DeploymentInfo;
 
 public class OIDCServletExtension implements ServletExtension {
-	 private static final Logger LOG = Logger.getLogger(OIDCServletExtension.class.getName());
+	private static final Logger LOG = Logger.getLogger(OIDCServletExtension.class.getName());
 	// private static final BootstrapLogger LOG =
 	// BootstrapLogger.logger(OIDCServletExtension.class.getName());
 
@@ -45,21 +47,20 @@ public class OIDCServletExtension implements ServletExtension {
 			mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
 			mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			
+
 			try {
 				// overwrite if it exists rather than merge
 				OIDC oidc = mapper.readValue(oidcJson, OIDC.class);
 				LOG.info("Registering OIDC authentication mechanism");
-				deploymentInfo.addAuthenticationMechanism("OIDC", new OIDCAuthenticationMechanism.Factory(oidc, deploymentInfo.getIdentityManager()));				
+				deploymentInfo.addAuthenticationMechanism("OIDC", new OIDCAuthenticationMechanism.Factory(oidc, deploymentInfo.getIdentityManager()));
 			} catch (Exception e) {
-				e.printStackTrace();
-				// LOG.error("", e);
+				LOG.log(Level.SEVERE, "", e);
 			}
 		} else {
-			// LOG.error("WEB-INF/oidc.json unavailable.");
-			System.err.println("WEB-INF/oidc.json unavailable.");
+			LOG.severe("WEB-INF/oidc.json unavailable.");
+
 		}
 
 	}
-	
+
 }
