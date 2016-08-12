@@ -17,11 +17,11 @@ package com.mercer.cpsg.swarm.oidc;
 import java.security.Principal;
 import java.util.Map;
 
-public class OIDCPrincipal implements Principal {
+public abstract class OIDCPrincipal implements Principal {
 	private final String name;
 	private final Map<String, Object> claims;
 
-	public OIDCPrincipal(String name, Map<String, Object> claims) {
+	protected OIDCPrincipal(String name, Map<String, Object> claims) {
 		this.name = name;
 		this.claims = claims;
 	}
