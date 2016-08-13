@@ -147,7 +147,11 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		context.setError(false);
 		exchange.putAttachment(OIDCContext.ATTACHMENT_KEY, context);
 
+<<<<<<< HEAD
 		LOG.fine("Requested URL: " + exchange.getRelativePath());
+=======
+		LOG.info("Requested URL: " + exchange.getRelativePath());
+>>>>>>> fc1fc56802fd5ccdeeaed67371cf1998a2bd26c3
 		if (exchange.getRequestHeaders().contains(Headers.AUTHORIZATION)) {
 			return processAuthorization(exchange);
 		}
