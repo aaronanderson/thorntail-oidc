@@ -146,12 +146,16 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		OIDCContext context = new OIDCContext();
 		context.setError(false);
 		exchange.putAttachment(OIDCContext.ATTACHMENT_KEY, context);
-
-<<<<<<< HEAD
+		
 		LOG.fine("Requested URL: " + exchange.getRelativePath());
-=======
-		LOG.info("Requested URL: " + exchange.getRelativePath());
->>>>>>> fc1fc56802fd5ccdeeaed67371cf1998a2bd26c3
+		
+		//Only authenticate if required. For example, if no auth-constraint is specified
+		//for a security-constraint in the web.xml unauthenticated access should be allowed.
+		if (!securityContext.isAuthenticationRequired()){
+			return AuthenticationMechanismOutcome.AUTHENTICATED;
+		}
+		
+		
 		if (exchange.getRequestHeaders().contains(Headers.AUTHORIZATION)) {
 			return processAuthorization(exchange);
 		}
