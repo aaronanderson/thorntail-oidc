@@ -1,0 +1,10 @@
+logger:
+    level: DEBUG
+swarm:
+  port:
+    offset: 0
+swarm:
+  oidc:
+    realm: demo
+    clientId: OIDCDemoClient
+    metadataURL: http://localhost:9090/auth/realms/demo/.well-known/openid-configuration

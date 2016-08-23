@@ -12,7 +12,6 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
  * This fraction was developed based on guidance from the WildFly Swarm faction authoring guide and examples of custom WildFly authentication modules
  * The [Nimbus OAuth 2.0 SDK with OpenID Connect extensions](http://connect2id.com/products/nimbus-oauth-openid-connect-sdk) library is used to perform the OIDC interactions with the Identity provider 
  * The ODIC configuration settings could have been defined through a WildFly sub-system extension however that would have added additional complexity beyond the configuration functionality provided by WildFly Swarm. Also with recent changes to WildFly and the evolving nature of WildFly Swarm documentation on developing sub-system extensions is either not current or available. Instead the OIDC configuration is persisted as a JSON file similar to how the Keycloak adapter is configured. 
- * Jackson is used to serialize and deserialize the OIDC configuration into JSON. This dependency is confined to the runtime module. Unfortunately the AbstractServerConfiguration#prepareArchive() method does not take the fraction definition as a parameter which is necessary for storing the OIDC configuration in the WAR archive in the runtime module. The definition is cached from another method call which is undesirable but necessary.
  * WildFly authentication extensions have two points of authentication: Undertow and JAAS. The Undertow [AuthenticationMechanism](https://github.com/undertow-io/undertow/blob/master/core/src/main/java/io/undertow/security/api/AuthenticationMechanism.java) performs the OIDC web choreography  while the [LoginModule](https://github.com/picketbox/picketbox/blob/master/security-jboss-sx/jbosssx/src/main/java/org/jboss/security/auth/spi/AbstractServerLoginModule.java) fulfills the JavaEE authentication requirements.
  * Role names are passed into the loginmodule via a non-standard claim named "groups"
  * The OIDC metadata URL is retrieved and parsed at startup time. If a network connection is not available the authentication module will not initialize and the container will need to be restarted. The JWS certificates could automatically rotate and the container would need to be restarted if this happens to pickup the latest metadata changes. 
@@ -21,8 +20,8 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
  
  ##Keycloak Setup
  
-1. Start the Keycloak server - Current fraction version incompatibilities prevent both the OIDC fraction and the Keycloak server from being started in the same Swarm application. Download the keycloak server from [here](http://search.maven.org/remotecontent?filepath=org/wildfly/swarm/keycloak-server/1.0.1.Final/keycloak-server-1.0.1.Final.jar) and start it using the command:
-`java -Dswarm.http.port=9090 -jar keycloak-1.0.0.Final-swarm.jar`  
+1. Start the Keycloak server - Current fraction version incompatibilities prevent both the OIDC fraction and the Keycloak server from being started in the same Swarm application. Download the keycloak server from [here](https://repo1.maven.org/maven2/org/wildfly/swarm/servers/keycloak/2016.8.1/keycloak-2016.8.1-swarm.jar) and start it using the command:
+`java -Dswarm.http.port=9090 -jar keycloak-2016.8.1-swarm.jar`  
  
 1. Access http://localhost:9090/auth/admin and login or create an admin account
  
@@ -50,20 +49,16 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
 
 ![Create Client2](test/src/docs/client2.png)
  
-1. Edit the test/src/main/webapp/WEB-INF/oidc.json and make sure the Keycloak configuration is set
+1. Edit the test/src/main/resources/project-stages.yml and make sure the Keycloak configuration is set
 
-``` javascript
+``` yml
 
- {
-  "realms" : [ {
-    "name" : "demo",
-    "provider" : {
-      "name" : "Keycloak",
-      "clientId" : "OIDCDemoClient",
-      "metadataURL" : "http://localhost:9090/auth/realms/demo/.well-known/openid-configuration"
-    }
-  } ]
-}
+swarm:
+  oidc:
+    realm: demo
+    clientId: OIDCDemoClient
+    metadataURL: http://localhost:9090/auth/realms/demo/.well-known/openid-configuration
+
 
 ```
  
@@ -87,19 +82,13 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
  
 1. Edit the test/src/main/webapp/WEB-INF/oidc.json and make sure the Keycloak configuration is set. Update the clientId with the value from Okta. Also be sure to override the scope setting so that groups are retrieved.
 
-``` javascript
+``` yml
+swarm:
+  oidc:
+    realm: demo
+    clientId: aaaaaaaaaaaaaaaaaaaaaa
+    metadataURL: https://OKTA_ORG.okta.com/.well-known/openid-configuration
 
- {
-  "realms" : [ {
-    "name" : "demo",
-    "provider" : {
-      "name" : "Okta",
-      "clientId" : "aaaaaaaaaaaaaaaaaaaaaa",
-      "scope" : "openid profile groups",     
-      "metadataURL" : "https://OKTA_ORG.okta.com/.well-known/openid-configuration"
-    }
-  } ]
-}
 
 ``` 
 
