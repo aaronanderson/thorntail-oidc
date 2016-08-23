@@ -17,16 +17,44 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.wildfly.swarm</groupId> <artifactId>keycloak</artifactId> <version>1.0.1.Final</version> </dependency> -->
 
 	</dependencies>
+
+	<!-- needed for swarm snapshots -->
+	<repositories>
+		<repository>
+			<id>projectodd-snapshots</id>
+			<name>Project:odd Snapshots from CI</name>
+			<url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>projectodd-snapshots</id>
+			<name>Project:odd Snapshots from CI</name>
+			<url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.wildfly.swarm</groupId>
 				<artifactId>wildfly-swarm-plugin</artifactId>
-				<version>1.0.0.Final</version>
+				<version>2016.9-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<goals>

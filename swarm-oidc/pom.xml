@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- <parent> <groupId>com.mercer.cpsg</groupId> <artifactId>wd-parent</artifactId> <version>0.0.1-SNAPSHOT</version> </parent> -->
+	<groupId>com.mercer.cpsg.swarm.oidc</groupId>
+	<artifactId>oidc</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Mercer CPSG Workday - WildFly Swarm OpenID Connect Auth</name>
+	<description>Mercer CPSG Workday - WildFly Swarm OpenID Connect Auth</description>
+
+
+	<properties>
+		<version.swarm>2016.9-SNAPSHOT</version.swarm>
+		<version.swarm.fraction-plugin>35</version.swarm.fraction-plugin>
+
+		<swarm.fraction.stability>stable</swarm.fraction.stability>
+		<swarm.fraction.tags>Security,Web</swarm.fraction.tags>
+
+		<version.jackson>2.5.4</version.jackson>
+		<version.nimbus>5.15</version.nimbus>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.wildfly.swarm</groupId>
+				<artifactId>bom-all</artifactId>
+				<version>${version.swarm}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>1.2</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.wildfly.swarm</groupId>
+			<artifactId>container</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.wildfly.swarm</groupId>
+			<artifactId>undertow</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.wildfly.swarm</groupId>
+			<artifactId>security</artifactId>
+		</dependency>
+
+		<!-- AbstractLoginModule -->
+		<dependency>
+			<groupId>org.picketbox</groupId>
+			<artifactId>jbosssx-bare</artifactId>
+			<version>4.9.7.Final</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- AccountImpl -->
+		<dependency>
+			<groupId>org.wildfly</groupId>
+			<artifactId>wildfly-undertow</artifactId>
+			<version>10.0.0.Final</version>
+			<scope>provided</scope>
+		</dependency>
+	
+		<!-- javax.activation -->
+		<dependency>
+			<groupId>org.wildfly</groupId>
+			<artifactId>wildfly-servlet-feature-pack</artifactId>
+			<version>10.0.0.Final</version>
+			<type>zip</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<!-- javax.mail -->
+		<dependency>
+			<groupId>org.wildfly</groupId>
+			<artifactId>wildfly-feature-pack</artifactId>
+			<version>10.0.0.Final</version>
+			<type>zip</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>${version.nimbus}</version>
+		</dependency>
+
+
+	</dependencies>
+
+	<!-- needed for swarm snapshots -->
+	<repositories>
+		<repository>
+			<id>projectodd-snapshots</id>
+			<name>Project:odd Snapshots from CI</name>
+			<url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>projectodd-snapshots</id>
+			<name>Project:odd Snapshots from CI</name>
+			<url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.wildfly.swarm</groupId>
+				<artifactId>wildfly-swarm-fraction-plugin</artifactId>
+				<version>${version.swarm.fraction-plugin}</version>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<reuseForks>false</reuseForks>
+					<runOrder>alphabetical</runOrder>
+					<failIfNoTests>false</failIfNoTests>
+					<systemPropertyVariables>
+						<swarm.bind.address>127.0.0.1</swarm.bind.address>
+						<project.version>${project.version}</project.version>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+
+
+
+
+</project>
