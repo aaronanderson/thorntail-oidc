@@ -13,7 +13,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.mercer.cpsg.swarm.oidc</groupId>
-			<artifactId>oidc</artifactId>
+			<artifactId>swarm-oidc</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
