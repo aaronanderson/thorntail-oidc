@@ -14,16 +14,10 @@
 
 package com.mercer.cpsg.swarm.oidc.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.jboss.shrinkwrap.api.Node;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.asset.NamedAsset;
 import org.jboss.shrinkwrap.impl.base.ArchiveBase;
 import org.jboss.shrinkwrap.impl.base.AssignableBase;
-import org.jboss.shrinkwrap.impl.base.importer.zip.ZipImporterImpl;
-import org.wildfly.swarm.bootstrap.util.BootstrapProperties;
 import org.wildfly.swarm.spi.api.JARArchive;
 import org.wildfly.swarm.undertow.descriptors.SecurityConstraint;
 import org.wildfly.swarm.undertow.descriptors.WebXmlAsset;
@@ -55,38 +49,11 @@ public class SecuredImpl extends AssignableBase<ArchiveBase<?>> implements Secur
 			}
 		}
 
-		InputStream oidcJson = Thread.currentThread().getContextClassLoader().getResourceAsStream("oidc.json");
-		if (oidcJson == null) {
-
-			String appArtifact = System.getProperty(BootstrapProperties.APP_ARTIFACT);
-
-			if (appArtifact != null) {
-				try (InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("_bootstrap/" + appArtifact)) {
-					ZipImporterImpl importer = new ZipImporterImpl(archive);
-					importer.importFrom(in);
-					Node jsonNode = archive.get("oidc.json");
-					if (jsonNode == null) {
-						jsonNode = archive.get("WEB-INF/oidc.json");
-					}
-
-					if (jsonNode != null && jsonNode.getAsset() != null) {
-						oidcJson = jsonNode.getAsset().openStream();
-					}
-				} catch (IOException e) {
-					// ignore
-					// e.printStackTrace();
-				}
-			}
-		}
+		
 
 		// Setup web.xml
 		this.asset.setContextParam("resteasy.scan", "true");
-
-		if (oidcJson != null) {
-			getArchive().as(JARArchive.class).add(new ByteArrayAsset(oidcJson), "WEB-INF/oidc.json");
-		} else {
-			// not adding it.
-		}
+		
 	}
 
 	@Override

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<!-- <parent> <groupId>com.mercer.cpsg</groupId> <artifactId>wd-parent</artifactId> <version>0.0.1-SNAPSHOT</version> </parent> -->
 	<groupId>com.mercer.cpsg.swarm.oidc</groupId>
-	<artifactId>oidc</artifactId>
+	<artifactId>swarm-oidc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Mercer CPSG Workday - WildFly Swarm OpenID Connect Auth</name>
