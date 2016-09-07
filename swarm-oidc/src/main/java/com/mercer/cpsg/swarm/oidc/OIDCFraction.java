@@ -23,7 +23,7 @@ import org.wildfly.swarm.spi.api.Fraction;
 public class OIDCFraction implements Fraction<OIDCFraction> {
 
 	private boolean inhibitDefaultSecurityDomain = false;
-	private OIDC<?> config = new OIDC();
+
 
 	public static OIDCFraction createDefaultFraction() {
 		return new OIDCFraction().applyDefaults();
@@ -37,7 +37,7 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 	@SuppressWarnings("unchecked")
 	public OIDCFraction config(OIDCConsumer consumer) {
 		if (consumer != null) {
-			consumer.accept(config);
+			consumer.accept(OIDC.getInstance());
 		}
 		return this;
 	}
@@ -51,11 +51,11 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 		return inhibitDefaultSecurityDomain;
 	}
 
-	@Produces
-	@Singleton
-	public OIDC<?> config() {
-		return config;
+	
+	public OIDC config() {
+		return OIDC.getInstance();
 	}
+
 
 	@Override
 	public OIDCFraction applyDefaults() {
@@ -65,7 +65,7 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 	@FunctionalInterface
 	public static interface OIDCConsumer {
 
-		void accept(OIDC<?> value);
+		void accept(OIDC value);
 
 		default OIDCConsumer andThen(OIDCConsumer after) {
 			return (c) -> {

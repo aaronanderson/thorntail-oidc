@@ -20,33 +20,6 @@
 
 	</dependencies>
 
-	<!-- needed for swarm snapshots -->
-	<repositories>
-		<repository>
-			<id>projectodd-snapshots</id>
-			<name>Project:odd Snapshots from CI</name>
-			<url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>projectodd-snapshots</id>
-			<name>Project:odd Snapshots from CI</name>
-			<url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 
 
 	<build>
@@ -54,7 +27,7 @@
 			<plugin>
 				<groupId>org.wildfly.swarm</groupId>
 				<artifactId>wildfly-swarm-plugin</artifactId>
-				<version>2016.9-SNAPSHOT</version>
+				<version>2016.9</version>
 				<executions>
 					<execution>
 						<goals>

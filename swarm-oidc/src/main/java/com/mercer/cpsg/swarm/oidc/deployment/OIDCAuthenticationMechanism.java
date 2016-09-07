@@ -146,7 +146,7 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 		context.setError(false);
 		exchange.putAttachment(OIDCContext.ATTACHMENT_KEY, context);
 
-		LOG.info("Requested URL: " + exchange.getRelativePath());
+		LOG.fine("Requested URL: " + exchange.getRelativePath());
 
 		// Only authenticate if required. For example, if no auth-constraint is specified
 		// for a security-constraint in the web.xml unauthenticated access should be allowed.
@@ -506,10 +506,10 @@ public class OIDCAuthenticationMechanism implements AuthenticationMechanism {
 
 	public static final class Factory implements AuthenticationMechanismFactory {
 
-		private OIDC<?> oidc;
+		private OIDC oidc;
 		private final IdentityManager identityManager;
 
-		public Factory(OIDC<?> oidc, IdentityManager identityManager) {
+		public Factory(OIDC oidc, IdentityManager identityManager) {
 			this.oidc = oidc;
 			this.identityManager = identityManager;
 		}

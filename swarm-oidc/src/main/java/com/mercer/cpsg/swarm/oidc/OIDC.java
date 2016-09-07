@@ -17,20 +17,25 @@ package com.mercer.cpsg.swarm.oidc;
 import java.io.Serializable;
 import java.util.List;
 
-public class OIDC<T extends OIDC<T>> implements Serializable {
+public class OIDC implements Serializable {
 
 	private String context = "/oidc";
 	private List<Realm> realms = new java.util.ArrayList<>();
 
-	public OIDC() {
+	private static OIDC INSTANCE = new OIDC();
+
+	private OIDC() {
 
 	}
-	
+
+	public static OIDC getInstance() {
+		return INSTANCE;
+	}
 
 	@SuppressWarnings("unchecked")
-	public T context(String context) {
+	public OIDC context(String context) {
 		this.context = context.startsWith("/") ? context : ("/" + context);
-		return (T) this;
+		return this;
 	}
 
 	public List<Realm> listRealms() {
@@ -38,25 +43,25 @@ public class OIDC<T extends OIDC<T>> implements Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public T realms(List<Realm> value) {
+	public OIDC realms(List<Realm> value) {
 		this.realms = value;
-		return (T) this;
+		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	public T realm(Realm value) {
+	public OIDC realm(Realm value) {
 		this.realms.add(value);
-		return (T) this;
+		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	public T realm(String childKey, RealmConsumer consumer) {
+	public OIDC realm(String childKey, RealmConsumer consumer) {
 		Realm child = new Realm(childKey);
 		if (consumer != null) {
 			consumer.accept(child);
 		}
 		realm(child);
-		return (T) this;
+		return this;
 	}
 
 	public String getContext() {

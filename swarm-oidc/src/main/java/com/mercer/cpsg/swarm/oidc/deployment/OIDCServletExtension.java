@@ -16,10 +16,10 @@ package com.mercer.cpsg.swarm.oidc.deployment;
 
 import java.util.logging.Logger;
 
-import javax.enterprise.inject.spi.CDI;
 import javax.servlet.ServletContext;
 
 import com.mercer.cpsg.swarm.oidc.OIDC;
+import com.mercer.cpsg.swarm.oidc.OIDCFraction;
 
 import io.undertow.servlet.ServletExtension;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -29,8 +29,7 @@ public class OIDCServletExtension implements ServletExtension {
 
 	@Override
 	public void handleDeployment(DeploymentInfo deploymentInfo, ServletContext servletContext) {
-		OIDC<?> oidcConfig =  CDI.current().select(OIDC.class).get();
-		
+		OIDC oidcConfig = OIDC.getInstance();
 		LOG.info("Registering OIDC authentication mechanism");
 		deploymentInfo.addAuthenticationMechanism("OIDC", new OIDCAuthenticationMechanism.Factory(oidcConfig, deploymentInfo.getIdentityManager()));
 
