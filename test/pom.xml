@@ -63,7 +63,7 @@
 						<configuration>
 							<mainClass>org.wildfly.swarm.Swarm</mainClass>
 						</configuration>
-					</execution>
+					</execution>					
 				</executions>
 			</plugin>
 		</plugins>

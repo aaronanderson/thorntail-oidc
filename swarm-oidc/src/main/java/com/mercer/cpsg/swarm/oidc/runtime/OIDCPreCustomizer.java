@@ -51,7 +51,7 @@ public class OIDCPreCustomizer implements Customizer {
 				});
 			}));
 		}
-		oidcFraction.setInstalledConfig(oidcFraction.config());
+
 
 	}
 }

@@ -15,13 +15,15 @@
 package com.mercer.cpsg.swarm.oidc;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Produces;
+import javax.inject.Singleton;
 
 import org.wildfly.swarm.spi.api.Fraction;
 
 public class OIDCFraction implements Fraction<OIDCFraction> {
 
 	private boolean inhibitDefaultSecurityDomain = false;
-	private OIDC<?> config;
+	private OIDC<?> config = new OIDC();
 
 	public static OIDCFraction createDefaultFraction() {
 		return new OIDCFraction().applyDefaults();
@@ -34,7 +36,6 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 
 	@SuppressWarnings("unchecked")
 	public OIDCFraction config(OIDCConsumer consumer) {
-		config = new OIDC();
 		if (consumer != null) {
 			consumer.accept(config);
 		}
@@ -50,18 +51,10 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 		return inhibitDefaultSecurityDomain;
 	}
 
+	@Produces
+	@Singleton
 	public OIDC<?> config() {
 		return config;
-	}
-
-	private static OIDC<?> installedConfig;
-
-	public void setInstalledConfig(OIDC<?> installedConfig) {
-		this.installedConfig = installedConfig;
-	}
-
-	public static OIDC<?> installedConfig() {
-		return installedConfig;
 	}
 
 	@Override
