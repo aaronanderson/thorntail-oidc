@@ -16,9 +16,6 @@ package com.mercer.cpsg.swarm.oidc.deployment;
 
 import java.util.logging.Logger;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.servlet.ServletContext;
 
@@ -32,10 +29,7 @@ public class OIDCServletExtension implements ServletExtension {
 
 	@Override
 	public void handleDeployment(DeploymentInfo deploymentInfo, ServletContext servletContext) {
-		BeanManager bm = CDI.current().getBeanManager();
-		Bean<OIDC> bean = (Bean<OIDC>) bm.getBeans(OIDC.class).iterator().next();
-		CreationalContext<OIDC> ctx = bm.createCreationalContext(bean);
-		OIDC oidcConfig = (OIDC) bm.getReference(bean, OIDC.class, ctx);
+		OIDC<?> oidcConfig =  CDI.current().select(OIDC.class).get();
 		
 		LOG.info("Registering OIDC authentication mechanism");
 		deploymentInfo.addAuthenticationMechanism("OIDC", new OIDCAuthenticationMechanism.Factory(oidcConfig, deploymentInfo.getIdentityManager()));
