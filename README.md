@@ -1,17 +1,20 @@
-# swarm-oidc
-[WildFly Swarm](http://wildfly-swarm.io/) OpenID Connect ([OIDC](http://openid.net/connect/)) [Fraction](https://wildfly-swarm.gitbooks.io/wildfly-swarm-users-guide/content/fraction_authoring.html)
+# thorntail-oidc
+[Thorntail](https://thorntail.io/) OpenID Connect ([OIDC](http://openid.net/connect/)) [Fraction](https://docs.thorntail.io/2.2.1.Final/#_how_to_create_a_fraction)
 
-WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a Keycloak server. Additionally the Keycloak solution includes OIDC adapters for various JavaEE application servers. This fraction was developed with the following motivations:
- * The Keycloak and WildFly Swarm Keycload adapter documentation is unclear if they are compatible with third party OIDC providers such as Okta.
+Thorntail (previously Thorntail) provides a Keycloak adapter that can be used in conjunction with a Keycloak server. Additionally the Keycloak solution includes OIDC adapters for various JavaEE application servers. This fraction was developed with the following motivations:
+ * The Keycloak and Thorntail OIDC adapter documentation is unclear if they are compatible with third party OIDC providers such as Okta.
  * Using a bundled adapter can be advantageous in many circumstances but in other situations having top-to-bottom access to the authentication pipeline is preferable. Opening up the OIDC relying party authentication logic can allow more elaborate functionality than can be provided by the stock Keycloak adapter such as local account autoprovisioning or accepting OIDC tokens from multiple identity providers. 
  
- * OIDC and Microservices are intended to be lightweight and this alternative WildFly/Swarm fraction has fewer dependencies than Keycloak and can be used as a reference implementation for custom WildFly Swarm authentication extensions.
+ * OIDC and Microservices are intended to be lightweight and this alternative Thorntail fraction has fewer dependencies than Keycloak and can be used as a reference implementation for custom Thorntail authentication extensions.
+ 
+ ##Warning
+ Wildfly 11 uses [Elytron](https://developer.jboss.org/wiki/WildFlyElytron-ProjectSummary) as it's new security implementation and it is unknown how much longer the legacy PicketBox support that this fraction is based on will be supported.
  
 ## Design Considerations
  
- * This fraction was developed based on guidance from the WildFly Swarm faction authoring guide and examples of custom WildFly authentication modules
+ * This fraction was developed based on guidance from the Thorntail faction authoring guide and examples of custom Thorntail authentication modules
  * The [Nimbus OAuth 2.0 SDK with OpenID Connect extensions](http://connect2id.com/products/nimbus-oauth-openid-connect-sdk) library is used to perform the OIDC interactions with the Identity provider 
- * The ODIC configuration settings could have been defined through a WildFly sub-system extension however that would have added additional complexity beyond the configuration functionality provided by WildFly Swarm. Also with recent changes to WildFly and the evolving nature of WildFly Swarm documentation on developing sub-system extensions is either not current or available. Instead the OIDC configuration is stored in a swarm project stages YML file. 
+ * The ODIC configuration settings could have been defined through a WildFly sub-system extension however that would have added additional complexity beyond the configuration functionality provided by Thorntail. Also with recent changes to WildFly and the evolving nature of Thorntail documentation on developing sub-system extensions is either not current or available. Instead the OIDC configuration is stored in a swarm project stages YML file. 
  * WildFly authentication extensions have two points of authentication: Undertow and JAAS. The Undertow [AuthenticationMechanism](https://github.com/undertow-io/undertow/blob/master/core/src/main/java/io/undertow/security/api/AuthenticationMechanism.java) performs the OIDC web choreography  while the [LoginModule](https://github.com/picketbox/picketbox/blob/master/security-jboss-sx/jbosssx/src/main/java/org/jboss/security/auth/spi/AbstractServerLoginModule.java) fulfills the JavaEE authentication requirements.
  * Role names are passed into the loginmodule via a non-standard claim named "groups"
  * The OIDC metadata URL is retrieved and parsed at startup time. If a network connection is not available the authentication module will not initialize and the container will need to be restarted. The JWS certificates could automatically rotate and the container would need to be restarted if this happens to pickup the latest metadata changes. 
@@ -20,12 +23,12 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
  
  ##Keycloak Setup
  
-1. Start the Keycloak server - Current fraction version incompatibilities prevent both the OIDC fraction and the Keycloak server from being started in the same Swarm application. Download the keycloak server from [here](https://repo1.maven.org/maven2/org/wildfly/swarm/servers/keycloak/2016.8.1/keycloak-2016.8.1-swarm.jar) and start it using the command:
-`java -Dswarm.http.port=9090 -jar keycloak-2016.8.1-swarm.jar`  
+1. Start the Keycloak server - Current fraction version incompatibilities prevent both the OIDC fraction and the Keycloak server from being started in the same Swarm application. Download the keycloak server from [here](https://repo1.maven.org/maven2/io/thorntail/servers/keycloak/2.2.0.Final/keycloak-2.2.0.Final-thorntail.jar) and start it using the command:
+`java -Dswarm.http.port=9090 -jar keycloak-2.2.0.Final-thorntail.jar`  
  
-1. Access http://localhost:9090/auth/admin and login or create an admin account
+1. Access http://localhost:9090/auth and create an admin account. After the account is created click the administration console link and login.
  
-1. Create a new realm named demo
+1. Add a new realm named demo
  
 1. Create a new user and set a password
 
@@ -43,7 +46,7 @@ WildFly Swarm provides a Keycloak adapter that can be used in conjunction with a
 
 ![Create Template2](test/src/docs/template2.png)
  
-1. Create a new client. Be sure to enable the implcit flow
+1. Create a new client. Be sure to enable the implict flow
  
 ![Create Client1](test/src/docs/client1.png)
 
@@ -95,9 +98,9 @@ swarm:
 ##Running the Application
 1. Star the test application and access it
 
-`mvn install; java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000 target/oidc-test-0.0.1-SNAPSHOT-swarm.jar`
+`mvn install; java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000 target/oidc-test-0.0.1-SNAPSHOT-thorntail.jar`
 
 The application can also be run with 
 
-`mvn wildfly-swarm:run` 
+`mvn thorntail:run` 
  

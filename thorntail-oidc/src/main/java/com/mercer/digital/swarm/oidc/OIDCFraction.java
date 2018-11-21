@@ -1,30 +1,25 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
-package com.mercer.cpsg.swarm.oidc;
+
+package com.mercer.digital.swarm.oidc;
+
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
 
+import org.wildfly.swarm.config.runtime.AttributeDocumentation;
 import org.wildfly.swarm.spi.api.Fraction;
+import org.wildfly.swarm.spi.api.annotations.Configurable;
 
 public class OIDCFraction implements Fraction<OIDCFraction> {
-
+	
+	@Configurable("mercer-digital-wd.oidc.inhibitDefaultSecurityDomain")
+	@AttributeDocumentation("Inhibit the default security domain")
 	private boolean inhibitDefaultSecurityDomain = false;
+	
+	/*@Configurable("mercer-digital-wd.oidc.removeAllSecurityConstraints")
+	@AttributeDocumentation("Remove all web.xml security constraints. Used in development stage to unprotect the application for expedited development")
+	private boolean removeAllSecurityConstraints = false;*/
 
-
+	
 	public static OIDCFraction createDefaultFraction() {
 		return new OIDCFraction().applyDefaults();
 	}
@@ -41,7 +36,7 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 		}
 		return this;
 	}
-
+	 
 	public OIDCFraction inhibitDefaultSecurityDomain() {
 		this.inhibitDefaultSecurityDomain = true;
 		return this;
@@ -51,6 +46,14 @@ public class OIDCFraction implements Fraction<OIDCFraction> {
 		return inhibitDefaultSecurityDomain;
 	}
 
+	/*public OIDCFraction removeAllSecurityConstraints() {
+		this.removeAllSecurityConstraints = true;
+		return this;
+	}
+
+	public boolean isRemoveAllSecurityConstraints() {
+		return removeAllSecurityConstraints;
+	}*/
 	
 	public OIDC config() {
 		return OIDC.getInstance();

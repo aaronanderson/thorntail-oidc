@@ -3,8 +3,15 @@ logger:
 swarm:
   port:
     offset: 0
-swarm:
+mercer-digital-wd:
   oidc:
     realm: demo
-    clientId: OIDCDemoClient
-    metadataURL: http://localhost:9090/auth/realms/demo/.well-known/openid-configuration
+    providers: 
+      - name: keycloak
+        clientId: OIDCDemoClient
+        #clientSecret: XXXXXXXXXXXXXXXXXXXXXXXXx
+        metadataURL: http://localhost:9090/auth/realms/demo/.well-known/openid-configuration
+    #used for local testing only
+    #default:
+    #  subject: demo@demo.com 
+    #  roles: ['Everyone', 'Administrator']

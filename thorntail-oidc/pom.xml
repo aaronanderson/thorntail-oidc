@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<!-- <parent> <groupId>com.mercer.cpsg</groupId> <artifactId>wd-parent</artifactId> <version>0.0.1-SNAPSHOT</version> </parent> -->
-	<groupId>com.mercer.cpsg.swarm.oidc</groupId>
-	<artifactId>swarm-oidc</artifactId>
+        <groupId>com.mercer.digital.thorntail.oidc</groupId>
+	<artifactId>thorntail-oidc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>OpenID Connect</name>
-	<description>Mercer CPSG Workday - WildFly Swarm OpenID Connect Auth</description>
+	<description>Mercer Digital Workday - Thorntail OpenID Connect Auth</description>
 
 
 	<properties>
-		<version.swarm>2016.9</version.swarm>
-		<version.swarm.fraction-plugin>36</version.swarm.fraction-plugin>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		
+		<version.thorntail>2.2.0.Final</version.thorntail>
+		<version.thorntail.fraction.plugin>88</version.thorntail.fraction.plugin>
 
-		<swarm.fraction.stability>stable</swarm.fraction.stability>
-		<swarm.fraction.tags>Security,Web</swarm.fraction.tags>
+		<thorntail.fraction.stability>stable</thorntail.fraction.stability>
+		<thorntail.fraction.tags>Security,Web</thorntail.fraction.tags>
 
-		<version.jackson>2.5.4</version.jackson>
-		<version.nimbus>5.15</version.nimbus>
+		<version.wildfly>11.0.0.Final</version.wildfly>
+
+		<version.nimbus>5.64.4</version.nimbus>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.wildfly.swarm</groupId>
-				<artifactId>bom-all</artifactId>
-				<version>${version.swarm}</version>
+				<groupId>io.thorntail</groupId>
+				<artifactId>bom</artifactId>
+				<version>${version.thorntail}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -36,6 +39,13 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
 			<version>1.2</version>
@@ -43,21 +53,32 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
+			<groupId>io.thorntail</groupId>
 			<artifactId>container</artifactId>
+			<version>${version.thorntail}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
+			<groupId>io.thorntail</groupId>
+			<artifactId>spi</artifactId>
+			<version>${version.thorntail}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.thorntail</groupId>
 			<artifactId>undertow</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
+			<groupId>io.thorntail</groupId>
 			<artifactId>security</artifactId>
+			<version>${version.thorntail}</version>
 		</dependency>
-		
-		
+
+
+
+
 
 		<!-- AbstractLoginModule -->
 		<dependency>
@@ -71,30 +92,15 @@
 		<dependency>
 			<groupId>org.wildfly</groupId>
 			<artifactId>wildfly-undertow</artifactId>
-			<version>10.1.0.Final</version>
+			<version>${version.wildfly}</version>
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- CDI 
-		<dependency>
-			<groupId>org.wildfly.core</groupId>
-			<artifactId>wildfly-core-feature-pack</artifactId>
-			<version>2.2.0.Final</version>
-			<type>zip</type>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>-->
-		
 		<!-- javax.activation -->
 		<dependency>
 			<groupId>org.wildfly</groupId>
 			<artifactId>wildfly-servlet-feature-pack</artifactId>
-			<version>10.1.0.Final</version>
+			<version>${version.wildfly}</version>
 			<type>zip</type>
 			<scope>provided</scope>
 			<exclusions>
@@ -104,12 +110,26 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- javax.mail -->
 		<dependency>
 			<groupId>org.wildfly</groupId>
 			<artifactId>wildfly-feature-pack</artifactId>
-			<version>10.1.0.Final</version>
+			<version>${version.wildfly}</version>
+			<type>zip</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.wildfly.core</groupId>
+			<artifactId>wildfly-core-feature-pack</artifactId>
+			<version>3.0.8.Final</version>
 			<type>zip</type>
 			<scope>provided</scope>
 			<exclusions>
@@ -121,6 +141,7 @@
 		</dependency>
 
 
+		<!-- make sure to update src/main/resources/com/nimbusds/oauh2-oidc-sdk/main/module.xml -->		
 		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>oauth2-oidc-sdk</artifactId>
@@ -134,21 +155,12 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.wildfly.swarm</groupId>
-				<artifactId>wildfly-swarm-fraction-plugin</artifactId>
-				<version>${version.swarm.fraction-plugin}</version>
+				<groupId>io.thorntail</groupId>
+				<artifactId>thorntail-fraction-plugin</artifactId>
+				<version>${version.thorntail.fraction.plugin}</version>
 				<executions>
 					<execution>
+						<id>process</id>
 						<phase>process-classes</phase>
 						<goals>
 							<goal>process</goal>
@@ -164,17 +176,11 @@
 					<runOrder>alphabetical</runOrder>
 					<failIfNoTests>false</failIfNoTests>
 					<systemPropertyVariables>
-						<swarm.bind.address>127.0.0.1</swarm.bind.address>
+						<thorntail.bind.address>127.0.0.1</thorntail.bind.address>
 						<project.version>${project.version}</project.version>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
-
-
-
-
-
 </project>

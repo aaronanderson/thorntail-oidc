@@ -1,18 +1,6 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
-package com.mercer.cpsg.swarm.oidc.internal;
+
+package com.mercer.digital.swarm.oidc.internal;
 
 import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.api.asset.NamedAsset;
@@ -22,7 +10,7 @@ import org.wildfly.swarm.spi.api.JARArchive;
 import org.wildfly.swarm.undertow.descriptors.SecurityConstraint;
 import org.wildfly.swarm.undertow.descriptors.WebXmlAsset;
 
-import com.mercer.cpsg.swarm.oidc.Secured;
+import com.mercer.digital.swarm.oidc.Secured;
 
 public class SecuredImpl extends AssignableBase<ArchiveBase<?>> implements Secured {
 

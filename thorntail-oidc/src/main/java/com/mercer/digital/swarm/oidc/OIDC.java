@@ -1,21 +1,12 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
-package com.mercer.cpsg.swarm.oidc;
+
+package com.mercer.digital.swarm.oidc;
+
 
 import java.io.Serializable;
 import java.util.List;
+
+import com.nimbusds.jwt.JWTClaimsSet;
 
 public class OIDC implements Serializable {
 
@@ -70,7 +61,8 @@ public class OIDC implements Serializable {
 
 	public static class Realm {
 		private String name;
-		private IdentityProvider provider;
+		private JWTClaimsSet defaultClaimSet;
+		private List<IdentityProvider> providers = new java.util.ArrayList<>();
 
 		@SuppressWarnings("unused")
 		private Realm() {
@@ -83,13 +75,27 @@ public class OIDC implements Serializable {
 		public String getName() {
 			return this.name;
 		}
-
-		public IdentityProvider getProvider() {
-			return provider;
+		
+		public JWTClaimsSet getDefaultClaimSet() {
+			return defaultClaimSet;
 		}
 
-		public Realm provider(IdentityProvider value) {
-			this.provider = value;
+		public Realm defaultClaimSet(JWTClaimsSet defaultClaimSet) {
+			this.defaultClaimSet = defaultClaimSet;
+			return this;
+		}
+		
+		public List<IdentityProvider> listProviders() {
+			return providers;
+		}
+
+		public Realm providers(List<IdentityProvider> providers) {
+			this.providers = providers;
+			return this;
+		}
+		
+		public Realm provider(IdentityProvider provider) {
+			providers.add( provider);
 			return this;
 		}
 
@@ -171,8 +177,8 @@ public class OIDC implements Serializable {
 
 		public void setClockSkew(int clockSkew) {
 			this.clockSkew = clockSkew;
-		}
-
+		}		
+		
 		public boolean isCheckNonce() {
 			return checkNonce;
 		}
